@@ -20,6 +20,10 @@ kramdown:
   input: GFM
   hard_wrap: true
 
+# 文章地址：/2026/11/22/标题/
+# 默认规则会把分类塞进地址里（/随笔/2026/...），中文会被转义成一长串 %E9%9A%8F...
+permalink: /:year/:month/:day/:title/
+
 header_pages:
   - about.md
 
