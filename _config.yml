@@ -14,6 +14,12 @@ show_excerpts: true
 minima:
   date_format: "%Y-%m-%d"
 
+# 按纯文本习惯写：单个回车就换行，段落之间空一行。
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: true
+
 header_pages:
   - about.md
 

@@ -26,6 +26,9 @@ GitHub Pages + Jekyll 的个人站，纯静态，不需要服务器。
 
 3. 后面写正文，提交到 `main` 分支。
 
+> 正文可以完全按纯文本写：一个回车就换行，段落之间空一行。
+> 已开启 `kramdown.hard_wrap`，不需要为了换行敲两个空格，也不需要用 `#`、`**` 这些符号。
+
 ## 开启 Pages
 
 仓库 Settings → Pages → Build and deployment：
