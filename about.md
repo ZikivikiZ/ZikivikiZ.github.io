@@ -15,6 +15,7 @@ permalink: /about/
 均有ai指导修改，本页也在ai指导下搭建。
 
 无论如何，谢谢你的阅读
+也很感激这些文字流于我的笔下
 
 - GitHub：<https://github.com/ZikivikiZ>
 - 邮箱：1007435278@qq.com
