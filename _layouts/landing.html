@@ -1,0 +1,37 @@
+---
+layout: default
+---
+<div class="home">
+  {%- if page.title -%}
+    <h1 class="page-heading">{{ page.title }}</h1>
+  {%- endif -%}
+
+  {{ content }}
+
+  {%- if site.posts.size > 0 -%}
+  <h2 class="post-list-heading">最近写</h2>
+  <ul style="list-style:none;padding:0;margin:0;">
+    {%- for post in site.posts limit:3 -%}
+    <li style="display:flex;justify-content:space-between;gap:1rem;align-items:baseline;padding:.65rem 0;border-bottom:1px solid #262628;">
+      <a class="post-link" href="{{ post.url | relative_url }}" style="flex:1;min-width:0;">{{ post.title | escape }}</a>
+      <span style="color:#8a8a8a;font-size:.82em;white-space:nowrap;font-variant-numeric:tabular-nums;">{{ post.date | date: "%Y-%m-%d" }}</span>
+    </li>
+    {%- endfor -%}
+  </ul>
+  <p style="margin:1.1rem 0 2.6rem;font-size:.9em;">
+    <a href="{{ '/essays/' | relative_url }}">全部随笔 →</a>
+  </p>
+  {%- endif -%}
+
+  {%- assign latest = site.data.notes | first -%}
+  {%- if latest -%}
+  <h2 class="post-list-heading">最近一条动态</h2>
+  <blockquote style="margin:0 0 1rem;">
+    <div style="color:#8a8a8a;font-size:.82em;font-variant-numeric:tabular-nums;">{{ latest.date }}</div>
+    <div style="margin-top:.4rem;line-height:1.9;">{{ latest.text | newline_to_br }}</div>
+  </blockquote>
+  <p style="font-size:.9em;margin:0 0 2rem;">
+    <a href="{{ '/notes/' | relative_url }}">全部动态 →</a>
+  </p>
+  {%- endif -%}
+</div>

@@ -1,8 +1,6 @@
 ---
-layout: home
-title: 首页
+layout: landing
+title: 天堂之外的庇护所
 ---
 
-天堂之外的庇护所
-
-<!-- 首页标题下面想写点什么就写在这里，删掉也不影响。 -->
+这里是 ZikivikiZ 的角落：写长一点的放在[随笔录]({{ '/essays/' | relative_url }})，想到什么就扔进[动态]({{ '/notes/' | relative_url }})。
