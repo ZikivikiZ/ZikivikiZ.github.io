@@ -1,0 +1,22 @@
+title: ZikivikiZ
+description: 随笔与折腾记录
+author: ZikivikiZ
+theme: minima
+lang: zh-CN
+timezone: Asia/Shanghai
+
+# 根站点（仓库名为 ZikivikiZ.github.io）时 baseurl 留空；
+# 若是项目仓库（如 notes），改成 "/notes"
+baseurl: ""
+url: "https://zikivikiz.github.io"
+
+show_excerpts: true
+minima:
+  date_format: "%Y-%m-%d"
+
+header_pages:
+  - about.md
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
