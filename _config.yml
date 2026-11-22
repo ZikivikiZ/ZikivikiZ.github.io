@@ -25,6 +25,7 @@ kramdown:
 permalink: /:year/:month/:day/:title/
 
 header_pages:
+  - notes.md
   - about.md
   - search.md
 

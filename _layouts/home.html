@@ -27,7 +27,7 @@ layout: default
           {%- if post.image -%}
           <a href="{{ post.url | relative_url }}" style="flex:0 0 220px;display:block;">
             <img src="{{ post.image | relative_url }}" alt="{{ post.title | escape }}"
-                 style="width:220px;height:124px;object-fit:cover;border-radius:6px;display:block;">
+                 style="width:220px;height:124px;object-fit:{{ post.image_fit | default: 'cover' }};border-radius:6px;display:block;">
           </a>
           {%- endif -%}
           {%- if site.show_excerpts -%}
