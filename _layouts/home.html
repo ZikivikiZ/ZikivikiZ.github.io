@@ -1,0 +1,38 @@
+---
+layout: default
+---
+<div class="home">
+  {%- if page.title -%}
+    <h1 class="page-heading">{{ page.title }}</h1>
+  {%- endif -%}
+
+  {{ content }}
+
+  {%- if site.posts.size > 0 -%}
+    <h2 class="post-list-heading">{{ page.list_title | default: "Posts" }}</h2>
+    <ul class="post-list" style="list-style:none;padding:0;">
+      {%- for post in site.posts -%}
+      <li style="display:flex;gap:1rem;align-items:flex-start;padding:1rem 0;border-bottom:1px solid #f0f0f0;">
+        {%- if post.image -%}
+        <a href="{{ post.url | relative_url }}" style="flex:0 0 120px;display:block;">
+          <img src="{{ post.image | relative_url }}" alt="{{ post.title | escape }}"
+               style="width:120px;height:84px;object-fit:cover;border-radius:6px;display:block;">
+        </a>
+        {%- endif -%}
+        <div style="flex:1;min-width:0;">
+          <span class="post-meta">{{ post.date | date: "%Y-%m-%d" }}</span>
+          <h3 style="margin:.25rem 0 .35rem;">
+            <a class="post-link" href="{{ post.url | relative_url }}">{{ post.title | escape }}</a>
+          </h3>
+          {%- if site.show_excerpts -%}
+          <p style="margin:0;font-size:.9em;color:#666;line-height:1.6;">
+            {{ post.excerpt | strip_html | strip_newlines | truncate: 70 }}
+          </p>
+          {%- endif -%}
+        </div>
+      </li>
+      {%- endfor -%}
+    </ul>
+    <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | relative_url }}">via RSS</a></p>
+  {%- endif -%}
+</div>
