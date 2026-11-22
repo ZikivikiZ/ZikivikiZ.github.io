@@ -26,7 +26,7 @@ permalink: /:year/:month/:day/:title/
 
 header_pages:
   - about.md
-  - tags.md
+  - search.md
 
 plugins:
   - jekyll-feed
