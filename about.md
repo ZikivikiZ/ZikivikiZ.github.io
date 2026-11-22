@@ -4,6 +4,9 @@ title: 关于笔者
 permalink: /about/
 ---
 
+<img src="{{ '/assets/images/avatar/avatar.jpg' | relative_url }}" alt="头像"
+     style="width:110px;height:110px;border-radius:50%;object-fit:cover;float:left;margin:0 1.1rem .6rem 0;">
+
 我是 Zikiviki·Z·Cyhy
 也可以称为 佐科里维琦·Z·尘灰烟火
 以及一个不熟悉的但是常见的网文名字:宋书晴
