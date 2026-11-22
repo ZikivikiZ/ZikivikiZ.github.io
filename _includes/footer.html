@@ -1,1 +1,16 @@
-<footer class="site-footer h-card" style="display:none;"></footer>
+<footer class="site-footer h-card">
+  <div class="wrapper" style="text-align:center;padding:1.5rem 0;">
+    <p id="dsh-quote" style="margin:0 0 .5rem;font-size:.9em;color:#828282;font-style:italic;min-height:1.5em;"></p>
+    <p style="margin:0;font-size:.72em;color:#b8b8b8;letter-spacing:.02em;">© {{ site.time | date: '%Y' }} {{ site.title }}</p>
+  </div>
+</footer>
+<script src="{{ '/assets/quotes.js' | relative_url }}"></script>
+<script>
+(function () {
+  var el = document.getElementById('dsh-quote');
+  if (!el) return;
+  var list = (window.DSH_QUOTES || []).filter(function (s) { return s && String(s).trim(); });
+  if (!list.length) { el.style.display = 'none'; return; }
+  el.textContent = list[Math.floor(Math.random() * list.length)];
+})();
+</script>
