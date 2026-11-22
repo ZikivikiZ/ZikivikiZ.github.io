@@ -52,3 +52,24 @@ layout: default
   </p>
 
 </article>
+
+<div id="read-progress" aria-hidden="true"
+     style="position:fixed;left:0;bottom:0;height:3px;width:0;z-index:9999;pointer-events:none;
+            background:linear-gradient(90deg,#4f8cff,#a06bff);transition:width .12s linear;"></div>
+<script>
+(function () {
+	var bar = document.getElementById('read-progress');
+	if (!bar) return;
+	function update() {
+		var doc = document.documentElement;
+		var total = doc.scrollHeight - window.innerHeight;
+		var top = window.pageYOffset || doc.scrollTop || 0;
+		var pct = total > 0 ? (top / total) * 100 : 100;
+		bar.style.width = Math.max(0, Math.min(100, pct)) + '%';
+	}
+	window.addEventListener('scroll', update, { passive: true });
+	window.addEventListener('resize', update);
+	update();
+})();
+</script>
+
