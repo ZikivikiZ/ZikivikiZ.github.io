@@ -17,3 +17,7 @@ permalink: /notes/
 {% else %}
 <p style="color:#8a8a8a;">还没有动态。</p>
 {% endif %}
+
+<p style="margin:2.5rem 0 0;font-size:.8em;">
+  <a href="https://github.com/ZikivikiZ/ZikivikiZ.github.io/edit/main/_data/notes.yml">编辑动态</a>
+</p>
