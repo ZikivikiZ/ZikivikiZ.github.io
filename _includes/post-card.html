@@ -1,0 +1,24 @@
+<li style="padding:1.3rem 0;border-bottom:1px solid #262628;">
+  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:1rem;">
+    <h3 style="margin:0;font-size:1.12em;line-height:1.45;flex:1;min-width:0;">
+      <a class="post-link" href="{{ include.post.url | relative_url }}">{{ include.post.title | escape }}</a>
+    </h3>
+    <span class="post-meta" style="white-space:nowrap;font-size:.85em;color:#828282;font-variant-numeric:tabular-nums;">
+      {{ include.post.date | date: "%Y-%m-%d" }}
+    </span>
+  </div>
+
+  <div style="display:flex;gap:1.1rem;margin-top:.65rem;align-items:flex-start;">
+    {%- if include.post.image -%}
+    <a href="{{ include.post.url | relative_url }}" style="flex:0 0 220px;display:block;">
+      <img src="{{ include.post.image | relative_url }}" alt="{{ include.post.title | escape }}"
+           style="width:220px;height:124px;object-fit:{{ include.post.image_fit | default: 'cover' }};border-radius:6px;display:block;">
+    </a>
+    {%- endif -%}
+    {%- if site.show_excerpts -%}
+    <p style="margin:0;flex:1;min-width:0;font-size:.92em;color:#b0b0b0;line-height:1.75;">
+      {{ include.post.excerpt | strip_html | strip_newlines | truncate: 90 }}
+    </p>
+    {%- endif -%}
+  </div>
+</li>
