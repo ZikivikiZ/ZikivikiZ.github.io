@@ -242,4 +242,10 @@
     0%   { background: rgba(255, 214, 102, .38); }
     70%  { background: rgba(255, 214, 102, .18); }
     100% { background: transparent; }
+  }
+  /* 刚发表的那条，短暂高亮一下 */
+  .comment-item.is-fresh { animation: freshFade 1.6s ease; }
+  @keyframes freshFade {
+    0% { background: rgba(255, 214, 102, .10); }
+    100% { background: transparent; }
   }</style>

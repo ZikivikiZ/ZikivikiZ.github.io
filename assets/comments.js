@@ -4,6 +4,11 @@
 
 	var endpoint = root.getAttribute('data-endpoint');
 	var post = root.getAttribute('data-post') || window.location.pathname || '';
+	/* data-post 是百分号编码过的地址；统一还原成原始路径，
+	   否则读写两侧的 key 会对不上，评论存进去却查不出来 */
+	try {
+		if (/%[0-9A-Fa-f]{2}/.test(post)) post = decodeURIComponent(post);
+	} catch (error) {}
 	var question = root.getAttribute('data-question') || '';
 	if (!endpoint) return;
 
@@ -284,6 +289,8 @@
 					var list = document.getElementById('cm-blocks');
 					if (list) list.textContent = '';
 				}
+				/* 先把自己刚发的那条插进去，不用等重新拉列表 */
+				if (result.data && result.data.id) prependComment(result.data);
 				load();
 			})
 			.catch(function () {
@@ -296,6 +303,15 @@
 	}
 
 	/* ---------- 评论列表 ---------- */
+
+	function prependComment(item) {
+		var empty = listEl.querySelector('.comment-empty');
+		if (empty) empty.remove();
+		var node = renderComment(item);
+		node.classList.add('is-fresh');
+		if (listEl.firstChild) listEl.insertBefore(node, listEl.firstChild);
+		else listEl.appendChild(node);
+	}
 
 	function removeItem(id, node) {
 		fetch(endpoint + '/comments/' + encodeURIComponent(id) + '?post=' + encodeURIComponent(post), {
