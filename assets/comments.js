@@ -3,6 +3,7 @@
 	if (!root) return;
 
 	var endpoint = root.getAttribute('data-endpoint');
+	var post = root.getAttribute('data-post') || '';
 	if (!endpoint) return;
 
 	var listEl = document.getElementById('comment-list');
@@ -26,6 +27,7 @@
 	var TOKEN_KEY = 'dsh_comment_admin';
 	var token = '';
 	var quote = '';
+	var statusTimer = null;
 	try {
 		token = localStorage.getItem(TOKEN_KEY) || '';
 	} catch (error) {
@@ -43,8 +45,6 @@
 			' ' + pad(d.getHours()) + ':' + pad(d.getMinutes())
 		);
 	}
-
-	var statusTimer = null;
 
 	function setStatus(text, kind) {
 		if (statusTimer) {
@@ -73,8 +73,12 @@
 		quoteBox.style.display = 'block';
 	}
 
+	function listUrl() {
+		return endpoint + '/comments?post=' + encodeURIComponent(post);
+	}
+
 	function removeItem(id, node) {
-		fetch(endpoint + '/comments/' + encodeURIComponent(id), {
+		fetch(endpoint + '/comments/' + encodeURIComponent(id) + '?post=' + encodeURIComponent(post), {
 			method: 'DELETE',
 			headers: { 'x-admin-token': token },
 		})
@@ -84,13 +88,13 @@
 					try {
 						localStorage.removeItem(TOKEN_KEY);
 					} catch (error) {}
-					throw new Error('管理密码不对');
+					throw new Error('hail robot!');
 				}
 				if (!res.ok) throw new Error('删除失败');
 				node.remove();
 			})
 			.catch(function (error) {
-				setStatus(error.message || '删除失败', 'error');
+				setStatus(error.message || '删除失败', error.message === 'hail robot!' ? 'plain' : 'error');
 			});
 	}
 
@@ -161,7 +165,7 @@
 	}
 
 	function load() {
-		fetch(endpoint + '/comments', { headers: { accept: 'application/json' } })
+		fetch(listUrl(), { headers: { accept: 'application/json' } })
 			.then(function (res) {
 				if (!res.ok) throw new Error('load failed');
 				return res.json();
@@ -179,6 +183,7 @@
 	form.addEventListener('submit', function (event) {
 		event.preventDefault();
 		var payload = {
+			post: post,
 			name: nameEl.value.trim(),
 			text: textEl.value.trim(),
 			answer: answerEl.value.trim(),
@@ -293,14 +298,28 @@
 		adminSave.addEventListener('click', function () {
 			var value = adminTokenEl.value.trim();
 			if (!value) return;
-			token = value;
-			try {
-				localStorage.setItem(TOKEN_KEY, value);
-			} catch (error) {}
-			adminTokenEl.value = '';
-			adminBox.style.display = 'none';
-			setStatus('管理模式已开启。', 'ok');
-			load();
+			/* 用一个不会命中的 id 探测密码是否正确 */
+			fetch(endpoint + '/comments/__probe__', {
+				method: 'DELETE',
+				headers: { 'x-admin-token': value },
+			}).then(function (res) {
+				if (res.status === 403) {
+					token = '';
+					try {
+						localStorage.removeItem(TOKEN_KEY);
+					} catch (error) {}
+					setStatus('hail robot!', 'plain');
+					return;
+				}
+				token = value;
+				try {
+					localStorage.setItem(TOKEN_KEY, value);
+				} catch (error) {}
+				adminTokenEl.value = '';
+				adminBox.style.display = 'none';
+				setStatus('管理模式已开启。', 'ok');
+				load();
+			});
 		});
 	}
 
@@ -311,7 +330,6 @@
 				localStorage.removeItem(TOKEN_KEY);
 			} catch (error) {}
 			adminBox.style.display = 'none';
-			setStatus('已退出管理模式。', 'ok');
 			load();
 		});
 	}

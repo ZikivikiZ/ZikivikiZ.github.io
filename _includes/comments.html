@@ -1,4 +1,6 @@
-<section id="comments" class="comments" data-endpoint="{{ site.comments_endpoint }}">
+<section id="comments" class="comments"
+         data-endpoint="{{ site.comments_endpoint }}"
+         data-post="{{ page.url | relative_url }}">
   <h2 class="comments-title">评论</h2>
   <div id="comment-list" class="comment-list"></div>
 
@@ -8,7 +10,8 @@
       <button id="comment-quote-clear" type="button" class="comment-quote-clear">取消引用</button>
     </div>
     <input id="comment-name" maxlength="20" placeholder="昵称" required>
-    <textarea id="comment-text" maxlength="1000" rows="3" placeholder="说点什么…" required></textarea>
+    <textarea id="comment-text" maxlength="1000" rows="4" required
+              placeholder="说点什么…（想针对正文某一句，就先在上面选中那段话，再点浮出的「引用」）"></textarea>
     <p class="comment-hint">
       Code：<strong>对我的指代及其变体与衍生，其中保留两个了i的那个是什么（四个字母两个音节）</strong>
     </p>

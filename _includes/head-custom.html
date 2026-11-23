@@ -62,6 +62,12 @@
     font-family: inherit; line-height: 1.6;
   }
   .comment-form input:focus, .comment-form textarea:focus { outline: none; border-color: #4f8cff; }
+  .comment-form textarea {
+    resize: vertical;          /* 只能往下拉长 */
+    min-height: 6rem;          /* 最小高度 */
+    max-height: 22rem;         /* 最大高度，超过后内部滚动 */
+    overflow-y: auto;
+  }
   .comment-hint { margin: .2rem 0 0; font-size: .85em; color: #8a8a8a; line-height: 1.7; }
   .comment-hint strong { color: #c8c8c8; font-weight: 500; }
   .comment-actions { display: flex; align-items: center; gap: 1rem; }
@@ -74,6 +80,7 @@
   .comment-status { font-size: .85em; color: #8a8a8a; }
   .comment-status.is-error { color: #ff8f8f; }
   .comment-status.is-ok { color: #7ddc9a; }
+  .comment-status.is-plain { color: #ffffff; }
 
   .comment-admin { margin-top: 1.5rem; font-size: .8em; color: #6c6c6c; display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
   .comment-admin > button, #comment-admin-box button {
