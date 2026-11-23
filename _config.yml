@@ -14,6 +14,9 @@ show_excerpts: true
 minima:
   date_format: "%Y-%m-%d"
 
+# 评论接口（Cloudflare Worker）
+comments_endpoint: "https://dsh-comments.1007435278.workers.dev"
+
 # 按纯文本习惯写：单个回车就换行，段落之间空一行。
 markdown: kramdown
 kramdown:

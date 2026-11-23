@@ -1,0 +1,18 @@
+<section id="comments" class="comments" data-endpoint="{{ site.comments_endpoint }}">
+  <h2 class="comments-title">评论</h2>
+  <div id="comment-list" class="comment-list"></div>
+
+  <form id="comment-form" class="comment-form" autocomplete="off">
+    <input id="comment-name" maxlength="20" placeholder="昵称" required>
+    <textarea id="comment-text" maxlength="1000" rows="3" placeholder="说点什么…" required></textarea>
+    <p class="comment-hint">
+      防灌水口令：<strong>对我的指代的变体和衍生中保留两个i的那个是什么</strong>
+    </p>
+    <input id="comment-answer" placeholder="输入答案" required>
+    <div class="comment-actions">
+      <button id="comment-submit" type="submit">发表</button>
+      <span id="comment-status" class="comment-status"></span>
+    </div>
+  </form>
+</section>
+<script src="{{ '/assets/comments.js' | relative_url }}"></script>
