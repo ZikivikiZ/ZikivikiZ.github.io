@@ -232,4 +232,14 @@
     .quote-back { top: auto; bottom: 5.2rem; left: .6rem; }
   }
 
-  ::highlight(quote-hit) { background-color: rgba(255, 214, 102, .32); color: inherit; }</style>
+  ::highlight(quote-hit) { background-color: rgba(255, 214, 102, .32); color: inherit; }
+  /* 原文被改过时，用段落定位的高亮 */
+  .quote-para-hit {
+    animation: quoteFlash 2.4s ease;
+    border-radius: 4px;
+  }
+  @keyframes quoteFlash {
+    0%   { background: rgba(255, 214, 102, .38); }
+    70%  { background: rgba(255, 214, 102, .18); }
+    100% { background: transparent; }
+  }</style>

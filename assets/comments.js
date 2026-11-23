@@ -139,7 +139,7 @@
 		return box;
 	}
 
-	function openComposer(seedQuote, inline) {
+	function openComposer(seedQuote, inline, seedPara) {
 		if (!composer) composer = buildComposer();
 
 		/* 从底部「写评论」进入时，就地展开一个普通输入框；
@@ -158,7 +158,7 @@
 		composer.style.display = 'block';
 		if (typeof bar !== 'undefined' && bar) bar.style.display = 'none';
 
-		if (seedQuote) addBlock(seedQuote);
+		if (seedQuote) addBlock(seedQuote, seedPara);
 		else if (!blocks.length) {
 			var draft = loadDraft();
 			if (draft && draft.length) blocks = draft;
@@ -173,9 +173,13 @@
 		hidePick();
 	}
 
-	function addBlock(quote) {
+	function addBlock(quote, para) {
 		if (blocks.length >= 8) return;
-		blocks.push({ quote: quote || '', text: '' });
+		blocks.push({
+			quote: quote || '',
+			text: '',
+			para: typeof para === 'number' && isFinite(para) ? para : null,
+		});
 	}
 
 	function renderBlocks(focusLast) {
@@ -227,7 +231,11 @@
 		var answer = answerEl.value.trim();
 		var items = blocks
 			.map(function (b) {
-				return { quote: (b.quote || '').trim(), text: (b.text || '').trim() };
+				return {
+					quote: (b.quote || '').trim(),
+					text: (b.text || '').trim(),
+					para: typeof b.para === 'number' && isFinite(b.para) ? b.para : null,
+				};
 			})
 			.filter(function (b) {
 				return b.text;
@@ -404,6 +412,32 @@
 		ensureBackButton().style.display = 'block';
 	}
 
+	/* 原文被改过：按引用时记下的段落序号跳过去 */
+	var paraHitTimer = null;
+
+	function jumpToPara(index, sourceEl) {
+		var body = document.querySelector('.post-content');
+		if (!body) return;
+		var blocks = body.querySelectorAll('p, h2, h3, h4, blockquote, li');
+		var target = blocks[index];
+		if (!target) return;
+
+		clearHighlight();
+		var previous = document.querySelector('.quote-para-hit');
+		if (previous) previous.classList.remove('quote-para-hit');
+		target.classList.add('quote-para-hit');
+		if (paraHitTimer) window.clearTimeout(paraHitTimer);
+		paraHitTimer = window.setTimeout(function () {
+			target.classList.remove('quote-para-hit');
+		}, 2600);
+
+		var top = target.getBoundingClientRect().top + window.pageYOffset - Math.round(window.innerHeight * 0.3);
+		window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+
+		lastSource = sourceEl;
+		ensureBackButton().style.display = 'block';
+	}
+
 	function renderComment(item) {
 		var wrap = el('div', 'comment-item');
 
@@ -428,15 +462,19 @@
 		list.forEach(function (block) {
 			if (block.quote) {
 				var found = quoteStillThere(block.quote);
-				var qb = el('div', 'comment-quote-block' + (found ? ' is-link' : ' is-gone'), block.quote);
-				if (found) {
-					qb.title = '点击跳到原文';
+				var hasPara = typeof block.para === 'number' && isFinite(block.para);
+				var canJump = found || hasPara;
+				var qb = el('div', 'comment-quote-block' + (canJump ? ' is-link' : ''), block.quote);
+				if (!found) qb.classList.add('is-gone');
+
+				if (canJump) {
+					qb.title = found ? '点击跳到原文' : '原文已修改，点击跳到原位置';
 					qb.addEventListener('click', function () {
-						jumpToQuote(block.quote, wrap);
+						if (found) jumpToQuote(block.quote, wrap);
+						else jumpToPara(block.para, wrap);
 					});
-				} else {
-					qb.appendChild(el('span', 'comment-quote-badge', '原内容已编辑'));
 				}
+				if (!found) qb.appendChild(el('span', 'comment-quote-badge', '原内容已编辑'));
 				wrap.appendChild(qb);
 			}
 			if (block.text) wrap.appendChild(el('div', 'comment-body', block.text));
@@ -530,20 +568,37 @@
 	document.body.appendChild(bar);
 
 	var pendingQuote = '';
+	var pendingPara = null;
 
-	function quoteSelected(text) {
+	/* 选区所在段落在正文里的序号（用于原文被改后的兜底定位） */
+	function paraIndexFromSelection() {
+		var body = document.querySelector('.post-content');
+		var sel = window.getSelection();
+		if (!body || !sel || !sel.anchorNode) return null;
+		var node = sel.anchorNode;
+		var el = node.nodeType === 1 ? node : node.parentElement;
+		if (!el || !body.contains(el)) return null;
+		var blocks = body.querySelectorAll('p, h2, h3, h4, blockquote, li');
+		for (var i = 0; i < blocks.length; i++) {
+			if (blocks[i].contains(el)) return i;
+		}
+		return null;
+	}
+
+	function quoteSelected(text, para) {
 		hidePick();
 		bar.style.display = 'none';
 		window.getSelection().removeAllRanges();
-		openComposer(text);
+		openComposer(text, false, para);
 	}
 
 	barBtn.addEventListener('click', function () {
-		if (pendingQuote) quoteSelected(pendingQuote);
+		if (pendingQuote) quoteSelected(pendingQuote, pendingPara);
 	});
 
 	pick.addEventListener('click', function () {
-		quoteSelected(pick.dataset.text || '');
+		var para = pick.dataset.para;
+		quoteSelected(pick.dataset.text || '', para === undefined ? null : Number(para));
 	});
 
 	/* 选区变化后 220ms 再判断，避开拖选过程中的抖动 */
@@ -558,6 +613,7 @@
 				return;
 			}
 			pendingQuote = text;
+			pendingPara = paraIndexFromSelection();
 			if (touchMode) {
 				hidePick();
 				if (composer && composer.style.display === 'block') {
@@ -568,6 +624,7 @@
 				}
 			} else {
 				placePick(text);
+				pick.dataset.para = pendingPara === null ? '' : String(pendingPara);
 			}
 		}, 220);
 	});
