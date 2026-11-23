@@ -139,8 +139,22 @@
 		return box;
 	}
 
-	function openComposer(seedQuote) {
+	function openComposer(seedQuote, inline) {
 		if (!composer) composer = buildComposer();
+
+		/* 从底部「写评论」进入时，就地展开一个普通输入框；
+		   从选中文字进入时，才用右下角浮层 */
+		var row = document.querySelector('.comment-open-row');
+		if (inline && row && row.parentNode) {
+			if (composer.parentNode !== row.parentNode) {
+				row.parentNode.insertBefore(composer, row.nextSibling);
+			}
+			composer.classList.add('cm-inline');
+		} else {
+			if (composer.parentNode !== document.body) document.body.appendChild(composer);
+			composer.classList.remove('cm-inline');
+		}
+
 		composer.style.display = 'block';
 		if (typeof bar !== 'undefined' && bar) bar.style.display = 'none';
 
@@ -296,6 +310,23 @@
 			});
 	}
 
+	var articleTextCache = null;
+
+	function normalizeText(value) {
+		return String(value || '').replace(/\s+/g, '').toLowerCase();
+	}
+
+	/* 引用还在不在当前正文里（忽略空白与大小写） */
+	function quoteStillThere(quote) {
+		var body = document.querySelector('.post-content');
+		if (!body) return true;
+		if (articleTextCache === null) {
+			articleTextCache = normalizeText(body.innerText || body.textContent || '');
+		}
+		if (!articleTextCache) return true;
+		return articleTextCache.indexOf(normalizeText(quote)) !== -1;
+	}
+
 	function renderComment(item) {
 		var wrap = el('div', 'comment-item');
 
@@ -318,7 +349,15 @@
 			: [{ quote: item.quote || '', text: item.text || '' }];
 
 		list.forEach(function (block) {
-			if (block.quote) wrap.appendChild(el('div', 'comment-quote-block', block.quote));
+			if (block.quote) {
+				var qb = el('div', 'comment-quote-block', block.quote);
+				if (!quoteStillThere(block.quote)) {
+					/* 引用内容在文章里找不到了：保留原文，挂一个标记 */
+					qb.classList.add('is-gone');
+					qb.appendChild(el('span', 'comment-quote-badge', '原内容已编辑'));
+				}
+				wrap.appendChild(qb);
+			}
 			if (block.text) wrap.appendChild(el('div', 'comment-body', block.text));
 		});
 
@@ -458,7 +497,7 @@
 
 	if (openBtn) {
 		openBtn.addEventListener('click', function () {
-			openComposer('');
+			openComposer('', true);
 		});
 	}
 

@@ -18,7 +18,7 @@ minima:
 comments_endpoint: "https://dsh-comments.1007435278.workers.dev"
 
 # 静态资源版本号：改了 assets/ 下的 js 就把它 +1，浏览器才会重新下载
-assets_version: 9
+assets_version: 10
 
 # 按纯文本习惯写：单个回车就换行，段落之间空一行。
 markdown: kramdown

@@ -201,4 +201,19 @@
   }
   @media (max-width: 560px) {
     .post-content img.post-image-sm { width: 84%; max-width: none; }
-  }</style>
+  }
+  /* 引用内容被改掉之后的标记 */
+  .comment-quote-block.is-gone { border-left-color: #6b4a4a; color: #b08f8f; }
+  .comment-quote-badge {
+    display: inline-block; margin-left: .5rem; padding: 0 .4rem;
+    font-size: .85em; line-height: 1.6; color: #d19a9a;
+    border: 1px solid #4a2f2f; border-radius: 4px; background: #1b1414;
+  }
+
+  /* 底部「写评论」展开的就地评论框 */
+  .cm-box.cm-inline {
+    position: static; width: 100%; max-height: none;
+    margin: 1rem 0 0; padding: .9rem 1rem 1rem;
+    box-shadow: none; border-radius: 8px;
+  }
+  .cm-box.cm-inline .cm-head { position: static; margin: -.9rem -1rem .7rem; }</style>
