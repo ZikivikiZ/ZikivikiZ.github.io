@@ -142,6 +142,7 @@
 	function openComposer(seedQuote) {
 		if (!composer) composer = buildComposer();
 		composer.style.display = 'block';
+		if (typeof bar !== 'undefined' && bar) bar.style.display = 'none';
 
 		if (seedQuote) addBlock(seedQuote);
 		else if (!blocks.length) {
@@ -378,12 +379,7 @@
 		return text.slice(0, 300);
 	}
 
-	function placePick() {
-		var text = selectionText();
-		if (!text) {
-			hidePick();
-			return;
-		}
+	function placePick(text) {
 		var rect = window.getSelection().getRangeAt(0).getBoundingClientRect();
 		pick.dataset.text = text;
 		pick.style.display = 'block';
@@ -399,21 +395,65 @@
 		pick.style.top = Math.max(8, top) + 'px';
 	}
 
-	document.addEventListener('mouseup', function () {
-		window.setTimeout(placePick, 10);
-	});
-	document.addEventListener('touchend', function () {
-		window.setTimeout(placePick, 280);
-	});
-	document.addEventListener('mousedown', function (event) {
-		if (event.target !== pick) hidePick();
+	/* 手机上没有可靠的「选完」事件，改成底部固定条 */
+	var touchMode = window.matchMedia
+		? window.matchMedia('(pointer: coarse)').matches
+		: 'ontouchstart' in window;
+
+	var bar = el('div', 'cm-quote-bar');
+	bar.style.display = 'none';
+	var barLabel = el('span', 'cm-quote-bar-label', '引用选中的文字');
+	var barBtn = el('button', 'cm-quote-bar-btn', '引用');
+	barBtn.type = 'button';
+	bar.appendChild(barLabel);
+	bar.appendChild(barBtn);
+	document.body.appendChild(bar);
+
+	var pendingQuote = '';
+
+	function quoteSelected(text) {
+		hidePick();
+		bar.style.display = 'none';
+		window.getSelection().removeAllRanges();
+		openComposer(text);
+	}
+
+	barBtn.addEventListener('click', function () {
+		if (pendingQuote) quoteSelected(pendingQuote);
 	});
 
 	pick.addEventListener('click', function () {
-		var text = pick.dataset.text || '';
-		hidePick();
-		window.getSelection().removeAllRanges();
-		openComposer(text);
+		quoteSelected(pick.dataset.text || '');
+	});
+
+	/* 选区变化后 220ms 再判断，避开拖选过程中的抖动 */
+	var selTimer = null;
+	document.addEventListener('selectionchange', function () {
+		if (selTimer) window.clearTimeout(selTimer);
+		selTimer = window.setTimeout(function () {
+			var text = selectionText();
+			if (!text) {
+				hidePick();
+				bar.style.display = 'none';
+				return;
+			}
+			pendingQuote = text;
+			if (touchMode) {
+				hidePick();
+				if (composer && composer.style.display === 'block') {
+					bar.style.display = 'none';
+				} else {
+					barLabel.textContent = '引用 ' + text.length + ' 字';
+					bar.style.display = 'flex';
+				}
+			} else {
+				placePick(text);
+			}
+		}, 220);
+	});
+
+	document.addEventListener('mousedown', function (event) {
+		if (event.target !== pick && !bar.contains(event.target)) hidePick();
 	});
 
 	if (openBtn) {

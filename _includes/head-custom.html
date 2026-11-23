@@ -171,4 +171,16 @@
 
   @media (max-width: 560px) {
     .cm-box { right: .5rem; left: .5rem; bottom: .5rem; width: auto; max-height: 82vh; }
+  }
+  /* 手机：选中文字后出现的底部引用条 */
+  .cm-quote-bar {
+    display: none; position: fixed; left: .6rem; right: .6rem; bottom: .8rem;
+    z-index: 9996; align-items: center; gap: .8rem;
+    padding: .6rem .85rem; background: #1b1b1e; border: 1px solid #3a3a3c;
+    border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,.6);
+  }
+  .cm-quote-bar-label { flex: 1; font-size: .82em; color: #a8a8a8; }
+  .cm-quote-bar-btn {
+    padding: .45rem 1.1rem; background: #2a2a2c; color: #f0f0f0;
+    border: 1px solid #4a4a4e; border-radius: 6px; font-size: .85em; cursor: pointer;
   }</style>
