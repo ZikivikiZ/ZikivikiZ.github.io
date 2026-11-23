@@ -3,7 +3,7 @@
 	if (!root) return;
 
 	var endpoint = root.getAttribute('data-endpoint');
-	var post = root.getAttribute('data-post') || '';
+	var post = root.getAttribute('data-post') || window.location.pathname || '';
 	if (!endpoint) return;
 
 	var listEl = document.getElementById('comment-list');
