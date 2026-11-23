@@ -13,6 +13,10 @@
 	var statusEl = document.getElementById('comment-status');
 	var submitEl = document.getElementById('comment-submit');
 
+	var quoteBox = document.getElementById('comment-quote');
+	var quoteTextEl = document.getElementById('comment-quote-text');
+	var quoteClearEl = document.getElementById('comment-quote-clear');
+
 	var adminToggle = document.getElementById('comment-admin-toggle');
 	var adminBox = document.getElementById('comment-admin-box');
 	var adminTokenEl = document.getElementById('comment-admin-token');
@@ -21,6 +25,7 @@
 
 	var TOKEN_KEY = 'dsh_comment_admin';
 	var token = '';
+	var quote = '';
 	try {
 		token = localStorage.getItem(TOKEN_KEY) || '';
 	} catch (error) {
@@ -42,6 +47,17 @@
 	function setStatus(text, kind) {
 		statusEl.textContent = text || '';
 		statusEl.className = 'comment-status' + (kind ? ' is-' + kind : '');
+	}
+
+	function setQuote(text) {
+		quote = text || '';
+		if (!quote) {
+			quoteBox.style.display = 'none';
+			quoteTextEl.textContent = '';
+			return;
+		}
+		quoteTextEl.textContent = quote;
+		quoteBox.style.display = 'block';
 	}
 
 	function removeItem(id, node) {
@@ -113,11 +129,19 @@
 				head.appendChild(del);
 			}
 
+			wrap.appendChild(head);
+
+			if (item.quote) {
+				var q = document.createElement('div');
+				q.className = 'comment-quote-block';
+				q.textContent = item.quote;
+				wrap.appendChild(q);
+			}
+
 			var body = document.createElement('div');
 			body.className = 'comment-body';
 			body.textContent = item.text;
 
-			wrap.appendChild(head);
 			wrap.appendChild(body);
 			listEl.appendChild(wrap);
 		});
@@ -145,6 +169,7 @@
 			name: nameEl.value.trim(),
 			text: textEl.value.trim(),
 			answer: answerEl.value.trim(),
+			quote: quote,
 		};
 		if (!payload.name || !payload.text || !payload.answer) {
 			setStatus('昵称、内容、口令都要填。', 'error');
@@ -171,6 +196,7 @@
 				}
 				textEl.value = '';
 				answerEl.value = '';
+				setQuote('');
 				setStatus('已发表。', 'ok');
 				load();
 			})
@@ -180,6 +206,67 @@
 			.finally(function () {
 				submitEl.disabled = false;
 			});
+	});
+
+	if (quoteClearEl) {
+		quoteClearEl.addEventListener('click', function () {
+			setQuote('');
+		});
+	}
+
+	/* 选中正文 → 出现「引用」按钮 */
+	var pick = document.createElement('button');
+	pick.type = 'button';
+	pick.className = 'quote-pick';
+	pick.textContent = '引用';
+	pick.style.display = 'none';
+	document.body.appendChild(pick);
+
+	function hidePick() {
+		pick.style.display = 'none';
+	}
+
+	function selectionText() {
+		var sel = window.getSelection();
+		if (!sel || sel.isCollapsed || sel.rangeCount === 0) return '';
+		var text = sel.toString().trim();
+		if (text.length < 4) return '';
+		var node = sel.anchorNode;
+		var el = node && (node.nodeType === 1 ? node : node.parentElement);
+		if (!el || !el.closest || !el.closest('.post-content')) return '';
+		return text.slice(0, 300);
+	}
+
+	function placePick() {
+		var text = selectionText();
+		if (!text) {
+			hidePick();
+			return;
+		}
+		var rect = window.getSelection().getRangeAt(0).getBoundingClientRect();
+		pick.style.left = Math.max(8, rect.left + window.pageXOffset + rect.width / 2 - 22) + 'px';
+		pick.style.top = rect.top + window.pageYOffset - 38 + 'px';
+		pick.dataset.text = text;
+		pick.style.display = 'block';
+	}
+
+	document.addEventListener('mouseup', function () {
+		window.setTimeout(placePick, 10);
+	});
+	document.addEventListener('touchend', function () {
+		window.setTimeout(placePick, 260);
+	});
+	document.addEventListener('mousedown', function (event) {
+		if (event.target !== pick) hidePick();
+	});
+
+	pick.addEventListener('click', function () {
+		setQuote(pick.dataset.text || '');
+		hidePick();
+		window.getSelection().removeAllRanges();
+		setStatus('已引用，写下你的看法吧。', 'ok');
+		root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		textEl.focus();
 	});
 
 	if (adminToggle) {

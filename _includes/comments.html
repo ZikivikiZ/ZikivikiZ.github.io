@@ -3,6 +3,10 @@
   <div id="comment-list" class="comment-list"></div>
 
   <form id="comment-form" class="comment-form" autocomplete="off">
+    <div id="comment-quote" class="comment-quote" style="display:none;">
+      <span id="comment-quote-text" class="comment-quote-text"></span>
+      <button id="comment-quote-clear" type="button" class="comment-quote-clear">取消引用</button>
+    </div>
     <input id="comment-name" maxlength="20" placeholder="昵称" required>
     <textarea id="comment-text" maxlength="1000" rows="3" placeholder="说点什么…" required></textarea>
     <p class="comment-hint">
