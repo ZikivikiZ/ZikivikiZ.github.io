@@ -14,4 +14,4 @@ permalink: /search/
   <ul id="post-search-results" style="list-style:none;padding:0;margin:1.6rem 0 0;"></ul>
 </div>
 
-<script src="{{ '/assets/search.js' | relative_url }}?v={{ site.time | date: '%Y%m%d%H%M' }}"></script>
+<script src="{{ '/assets/search.js' | relative_url }}?v={{ site.assets_version }}"></script>

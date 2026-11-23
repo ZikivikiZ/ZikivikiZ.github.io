@@ -13,6 +13,20 @@
 	var statusEl = document.getElementById('comment-status');
 	var submitEl = document.getElementById('comment-submit');
 
+	var adminToggle = document.getElementById('comment-admin-toggle');
+	var adminBox = document.getElementById('comment-admin-box');
+	var adminTokenEl = document.getElementById('comment-admin-token');
+	var adminSave = document.getElementById('comment-admin-save');
+	var adminClear = document.getElementById('comment-admin-clear');
+
+	var TOKEN_KEY = 'dsh_comment_admin';
+	var token = '';
+	try {
+		token = localStorage.getItem(TOKEN_KEY) || '';
+	} catch (error) {
+		token = '';
+	}
+
 	function pad(n) {
 		return n < 10 ? '0' + n : String(n);
 	}
@@ -28,6 +42,27 @@
 	function setStatus(text, kind) {
 		statusEl.textContent = text || '';
 		statusEl.className = 'comment-status' + (kind ? ' is-' + kind : '');
+	}
+
+	function removeItem(id, node) {
+		fetch(endpoint + '/comments/' + encodeURIComponent(id), {
+			method: 'DELETE',
+			headers: { 'x-admin-token': token },
+		})
+			.then(function (res) {
+				if (res.status === 403) {
+					token = '';
+					try {
+						localStorage.removeItem(TOKEN_KEY);
+					} catch (error) {}
+					throw new Error('管理密码不对');
+				}
+				if (!res.ok) throw new Error('删除失败');
+				node.remove();
+			})
+			.catch(function (error) {
+				setStatus(error.message || '删除失败', 'error');
+			});
 	}
 
 	function render(items) {
@@ -48,6 +83,7 @@
 			listEl.appendChild(empty);
 			return;
 		}
+
 		items.forEach(function (item) {
 			var wrap = document.createElement('div');
 			wrap.className = 'comment-item';
@@ -65,6 +101,17 @@
 
 			head.appendChild(name);
 			head.appendChild(time);
+
+			if (token) {
+				var del = document.createElement('button');
+				del.type = 'button';
+				del.className = 'comment-del';
+				del.textContent = '删除';
+				del.addEventListener('click', function () {
+					if (window.confirm('删除这条评论？')) removeItem(item.id, wrap);
+				});
+				head.appendChild(del);
+			}
 
 			var body = document.createElement('div');
 			body.className = 'comment-body';
@@ -114,7 +161,7 @@
 		})
 			.then(function (res) {
 				return res.json().then(function (data) {
-					return { ok: res.ok, status: res.status, data: data };
+					return { ok: res.ok, data: data };
 				});
 			})
 			.then(function (result) {
@@ -134,6 +181,40 @@
 				submitEl.disabled = false;
 			});
 	});
+
+	if (adminToggle) {
+		adminToggle.addEventListener('click', function () {
+			adminBox.style.display = adminBox.style.display === 'none' ? 'inline-flex' : 'none';
+			if (adminBox.style.display === 'inline-flex') adminTokenEl.focus();
+		});
+	}
+
+	if (adminSave) {
+		adminSave.addEventListener('click', function () {
+			var value = adminTokenEl.value.trim();
+			if (!value) return;
+			token = value;
+			try {
+				localStorage.setItem(TOKEN_KEY, value);
+			} catch (error) {}
+			adminTokenEl.value = '';
+			adminBox.style.display = 'none';
+			setStatus('管理模式已开启。', 'ok');
+			load();
+		});
+	}
+
+	if (adminClear) {
+		adminClear.addEventListener('click', function () {
+			token = '';
+			try {
+				localStorage.removeItem(TOKEN_KEY);
+			} catch (error) {}
+			adminBox.style.display = 'none';
+			setStatus('已退出管理模式。', 'ok');
+			load();
+		});
+	}
 
 	load();
 })();

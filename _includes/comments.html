@@ -14,5 +14,14 @@
       <span id="comment-status" class="comment-status"></span>
     </div>
   </form>
+
+  <p class="comment-admin">
+    <button id="comment-admin-toggle" type="button">管理</button>
+    <span id="comment-admin-box" style="display:none;">
+      <input id="comment-admin-token" type="password" placeholder="管理密码" autocomplete="off">
+      <button id="comment-admin-save" type="button">确定</button>
+      <button id="comment-admin-clear" type="button">退出</button>
+    </span>
+  </p>
 </section>
-<script src="{{ '/assets/comments.js' | relative_url }}?v={{ site.time | date: '%Y%m%d%H%M' }}"></script>
+<script src="{{ '/assets/comments.js' | relative_url }}?v={{ site.assets_version }}"></script>

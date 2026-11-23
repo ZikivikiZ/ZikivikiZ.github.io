@@ -4,7 +4,7 @@
     <p style="margin:0;font-size:.72em;color:#b8b8b8;letter-spacing:.02em;">© {{ site.time | date: '%Y' }} {{ site.title }}</p>
   </div>
 </footer>
-<script src="{{ '/assets/quotes.js' | relative_url }}?v={{ site.time | date: '%Y%m%d%H%M' }}"></script>
+<script src="{{ '/assets/quotes.js' | relative_url }}?v={{ site.assets_version }}"></script>
 <script>
 (function () {
   var el = document.getElementById('dsh-quote');
