@@ -44,9 +44,22 @@
 		);
 	}
 
+	var statusTimer = null;
+
 	function setStatus(text, kind) {
+		if (statusTimer) {
+			window.clearTimeout(statusTimer);
+			statusTimer = null;
+		}
 		statusEl.textContent = text || '';
 		statusEl.className = 'comment-status' + (kind ? ' is-' + kind : '');
+		if (text && kind === 'ok') {
+			statusTimer = window.setTimeout(function () {
+				statusEl.textContent = '';
+				statusEl.className = 'comment-status';
+				statusTimer = null;
+			}, 3500);
+		}
 	}
 
 	function setQuote(text) {
