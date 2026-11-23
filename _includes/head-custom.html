@@ -30,6 +30,16 @@
   .post-content img, .post-cover img { border-radius: 6px; }
   .svg-icon { fill: #8a8a8a; }
 
+  /* 超长链接在窄屏上换行，别撑出屏幕 */
+  .post-content p, .post-content li, .post-content blockquote {
+    overflow-wrap: break-word;
+  }
+  .post-content a {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  .post-content pre { overflow-x: auto; }
+
   .comments { margin-top: 3rem; padding-top: 1.6rem; border-top: 1px solid #262628; }
   .comments-title { font-size: 1.05em; margin: 0 0 1.2rem; color: #f2f2f2; }
   .comment-item { padding: .9rem 0; border-bottom: 1px solid #202022; }
