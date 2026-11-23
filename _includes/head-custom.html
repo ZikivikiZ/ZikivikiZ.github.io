@@ -183,4 +183,12 @@
   .cm-quote-bar-btn {
     padding: .45rem 1.1rem; background: #2a2a2c; color: #f0f0f0;
     border: 1px solid #4a4a4e; border-radius: 6px; font-size: .85em; cursor: pointer;
+  }
+  /* 正文里的「小图」：保持竖排，但别占满整行 */
+  .post-content img.post-image-sm {
+    display: block; width: 62%; max-width: 360px; height: auto;
+    margin: 1.5rem auto;
+  }
+  @media (max-width: 560px) {
+    .post-content img.post-image-sm { width: 84%; max-width: none; }
   }</style>
