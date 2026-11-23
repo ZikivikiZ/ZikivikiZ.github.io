@@ -291,7 +291,11 @@
 				}
 				/* 先把自己刚发的那条插进去，不用等重新拉列表 */
 				if (result.data && result.data.id) prependComment(result.data);
-				load();
+				/* Cloudflare KV 的写入是全球最终一致的，刚写完立刻 list 往往还看不到，
+				   所以这里不马上重拉，避免把自己刚插进去的那条冲掉 */
+				window.setTimeout(function () {
+					load();
+				}, 6000);
 			})
 			.catch(function () {
 				statusEl.textContent = '网络错误，稍后再试。';
@@ -309,6 +313,8 @@
 		if (empty) empty.remove();
 		var node = renderComment(item);
 		node.classList.add('is-fresh');
+		if (item.id) node.setAttribute('data-id', item.id);
+		if (item.at) node.setAttribute('data-at', String(item.at));
 		if (listEl.firstChild) listEl.insertBefore(node, listEl.firstChild);
 		else listEl.appendChild(node);
 	}
@@ -524,7 +530,28 @@
 				if (!res.ok) throw new Error('load failed');
 				return res.json();
 			})
-			.then(render)
+			.then(function (items) {
+				/* 服务端可能还没同步到刚写的那条，把本地的先留着，别冲掉 */
+				var serverIds = {};
+				(items || []).forEach(function (item) {
+					serverIds[item.id] = true;
+				});
+				var keep = [];
+				var nodes = listEl.querySelectorAll('.comment-item');
+				for (var i = 0; i < nodes.length; i++) {
+					var node = nodes[i];
+					var id = node.getAttribute('data-id');
+					var at = Number(node.getAttribute('data-at') || 0);
+					if (id && !serverIds[id] && Date.now() - at < 120000) keep.push(node);
+				}
+
+				render(items);
+
+				for (var j = keep.length - 1; j >= 0; j--) {
+					if (listEl.firstChild) listEl.insertBefore(keep[j], listEl.firstChild);
+					else listEl.appendChild(keep[j]);
+				}
+			})
 			.catch(function () {
 				listEl.textContent = '';
 				listEl.appendChild(el('p', 'comment-empty', '评论加载失败，刷新重试。'));
