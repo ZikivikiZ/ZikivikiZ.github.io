@@ -385,10 +385,18 @@
 			return;
 		}
 		var rect = window.getSelection().getRangeAt(0).getBoundingClientRect();
-		pick.style.left = Math.max(8, rect.left + window.pageXOffset + rect.width / 2 - 30) + 'px';
-		pick.style.top = rect.top + window.pageYOffset - 44 + 'px';
 		pick.dataset.text = text;
 		pick.style.display = 'block';
+
+		/* 默认贴在选区左侧，贴着那一行的垂直中线 */
+		var width = pick.offsetWidth || 60;
+		var height = pick.offsetHeight || 28;
+		var left = rect.left + window.pageXOffset - width - 10;
+		if (left < 8) left = rect.left + window.pageXOffset + rect.width + 10;
+		var top = rect.top + window.pageYOffset + rect.height / 2 - height / 2;
+
+		pick.style.left = Math.max(8, left) + 'px';
+		pick.style.top = Math.max(8, top) + 'px';
 	}
 
 	document.addEventListener('mouseup', function () {
