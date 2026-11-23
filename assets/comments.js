@@ -318,13 +318,90 @@
 
 	/* 引用还在不在当前正文里（忽略空白与大小写） */
 	function quoteStillThere(quote) {
+		var map = getTextMap();
+		if (!map) return true;
+		if (!map.norm) return true;
+		return map.norm.indexOf(normalizeText(quote)) !== -1;
+	}
+
+	/* 把正文拼成一条「去空白」的字符串，并记住每个字符来自哪个文本节点，
+	   这样就能从引用文字反查出它在页面里的位置 */
+	var textMapCache = null;
+
+	function getTextMap() {
 		var body = document.querySelector('.post-content');
-		if (!body) return true;
-		if (articleTextCache === null) {
-			articleTextCache = normalizeText(body.innerText || body.textContent || '');
+		if (!body) return null;
+		if (textMapCache) return textMapCache;
+
+		var walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, null);
+		var norm = '';
+		var positions = [];
+		var node;
+		while ((node = walker.nextNode())) {
+			var value = node.nodeValue || '';
+			for (var i = 0; i < value.length; i++) {
+				var ch = value.charAt(i);
+				if (/\s/.test(ch)) continue;
+				norm += ch.toLowerCase();
+				positions.push({ node: node, offset: i });
+			}
 		}
-		if (!articleTextCache) return true;
-		return articleTextCache.indexOf(normalizeText(quote)) !== -1;
+		textMapCache = { norm: norm, positions: positions };
+		return textMapCache;
+	}
+
+	function clearHighlight() {
+		if (window.CSS && CSS.highlights) CSS.highlights.delete('quote-hit');
+	}
+
+	var backBtn = null;
+	var lastSource = null;
+
+	function ensureBackButton() {
+		if (backBtn) return backBtn;
+		backBtn = el('button', 'quote-back', '← 返回评论');
+		backBtn.type = 'button';
+		backBtn.addEventListener('click', function () {
+			clearHighlight();
+			backBtn.style.display = 'none';
+			if (lastSource && lastSource.scrollIntoView) {
+				lastSource.scrollIntoView({ behavior: 'smooth', block: 'center' });
+			}
+		});
+		document.body.appendChild(backBtn);
+		return backBtn;
+	}
+
+	function jumpToQuote(quote, sourceEl) {
+		var map = getTextMap();
+		if (!map) return;
+		var needle = normalizeText(quote);
+		if (!needle) return;
+		var index = map.norm.indexOf(needle);
+		if (index < 0) return;
+
+		var start = map.positions[index];
+		var end = map.positions[index + needle.length - 1];
+		if (!start || !end) return;
+
+		var range = document.createRange();
+		try {
+			range.setStart(start.node, start.offset);
+			range.setEnd(end.node, end.offset + 1);
+		} catch (error) {
+			return;
+		}
+
+		if (window.CSS && CSS.highlights && window.Highlight) {
+			CSS.highlights.set('quote-hit', new Highlight(range));
+		}
+
+		var rect = range.getBoundingClientRect();
+		var top = rect.top + window.pageYOffset - Math.round(window.innerHeight * 0.3);
+		window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+
+		lastSource = sourceEl;
+		ensureBackButton().style.display = 'block';
 	}
 
 	function renderComment(item) {
@@ -350,10 +427,14 @@
 
 		list.forEach(function (block) {
 			if (block.quote) {
-				var qb = el('div', 'comment-quote-block', block.quote);
-				if (!quoteStillThere(block.quote)) {
-					/* 引用内容在文章里找不到了：保留原文，挂一个标记 */
-					qb.classList.add('is-gone');
+				var found = quoteStillThere(block.quote);
+				var qb = el('div', 'comment-quote-block' + (found ? ' is-link' : ' is-gone'), block.quote);
+				if (found) {
+					qb.title = '点击跳到原文';
+					qb.addEventListener('click', function () {
+						jumpToQuote(block.quote, wrap);
+					});
+				} else {
 					qb.appendChild(el('span', 'comment-quote-badge', '原内容已编辑'));
 				}
 				wrap.appendChild(qb);
