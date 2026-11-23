@@ -1,26 +1,14 @@
 <section id="comments" class="comments"
          data-endpoint="{{ site.comments_endpoint }}"
-         data-post="{{ page.url | relative_url }}">
+         data-post="{{ page.url | relative_url }}"
+         data-question="对我的指代及其变体与衍生，其中保留了两个i的那个是什么（四个字母两个音节）">
   <h2 class="comments-title">评论</h2>
   <div id="comment-list" class="comment-list"></div>
 
-  <form id="comment-form" class="comment-form" autocomplete="off">
-    <div id="comment-quote" class="comment-quote" style="display:none;">
-      <span id="comment-quote-text" class="comment-quote-text"></span>
-      <button id="comment-quote-clear" type="button" class="comment-quote-clear">取消引用</button>
-    </div>
-    <input id="comment-name" maxlength="20" placeholder="昵称" required>
-    <textarea id="comment-text" maxlength="1000" rows="4" required
-              placeholder="说点什么…（想针对正文某一句，就先在上面选中那段话，再点浮出的「引用」）"></textarea>
-    <p class="comment-hint">
-      Code：<strong>对我的指代及其变体与衍生，其中保留了两个i的那个是什么（四个字母两个音节）</strong>
-    </p>
-    <input id="comment-answer" placeholder="输入答案" required>
-    <div class="comment-actions">
-      <button id="comment-submit" type="submit">发表</button>
-      <span id="comment-status" class="comment-status"></span>
-    </div>
-  </form>
+  <p class="comment-open-row">
+    <button id="comment-open" type="button" class="comment-open">写评论</button>
+    <span class="comment-open-hint">选中正文任意一段，可以针对它单独写</span>
+  </p>
 
   <p class="comment-admin">
     <button id="comment-admin-toggle" type="button">管理</button>

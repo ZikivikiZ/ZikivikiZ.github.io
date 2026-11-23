@@ -42,45 +42,40 @@
 
   .comments { margin-top: 3rem; padding-top: 1.6rem; border-top: 1px solid #262628; }
   .comments-title { font-size: 1.05em; margin: 0 0 1.2rem; color: #f2f2f2; }
-  .comment-item { padding: 1.1rem 0; border-bottom: 1px solid #202022; }
+  .comment-item { padding: 1.2rem 0; border-bottom: 1px solid #202022; }
   .comment-head { display: flex; align-items: baseline; gap: .7rem; font-size: .8em; color: #7a7a7a; }
   .comment-name { color: #cfcfcf; font-weight: 600; letter-spacing: .01em; }
   .comment-time { font-variant-numeric: tabular-nums; }
-  .comment-body { margin-top: .5rem; font-size: 1em; line-height: 1.95; color: #e4e4e4; white-space: pre-wrap; word-break: break-word; }
   .comment-quote-block {
-    margin: .5rem 0 0; padding: .5rem .8rem; border-left: 2px solid #3a3a3c;
-    color: #9a9a9a; font-size: .88em; line-height: 1.8; white-space: pre-wrap; word-break: break-word;
+    margin: .55rem 0 .4rem; padding: .5rem .85rem; border-left: 2px solid #3a3a3c;
+    color: #9a9a9a; font-size: .88em; line-height: 1.85; white-space: pre-wrap; word-break: break-word;
     background: #141416; border-radius: 0 4px 4px 0;
   }
+  .comment-body {
+    margin: .35rem 0 0; font-size: 1em; line-height: 1.95; color: #e4e4e4;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .comment-body + .comment-quote-block { margin-top: 1rem; }
   .comment-empty { color: #8a8a8a; font-size: .9em; margin: 0; line-height: 1.9; }
   .comment-strike { text-decoration: line-through; color: #6c6c6c; }
 
-  .comment-form { margin-top: 1.8rem; display: flex; flex-direction: column; gap: .6rem; }
-  .comment-form input, .comment-form textarea {
-    width: 100%; box-sizing: border-box; padding: .6rem .75rem; font-size: .95em;
-    background: #141416; color: #e6e6e6; border: 1px solid #2a2a2c; border-radius: 6px;
-    font-family: inherit; line-height: 1.6;
-  }
-  .comment-form input:focus, .comment-form textarea:focus { outline: none; border-color: #4f8cff; }
-  .comment-form textarea {
-    resize: vertical;          /* 只能往下拉长 */
-    min-height: 6rem;          /* 最小高度 */
-    max-height: 22rem;         /* 最大高度，超过后内部滚动 */
-    overflow-y: auto;
-  }
-  .comment-hint { margin: .2rem 0 0; font-size: .85em; color: #8a8a8a; line-height: 1.7; }
-  .comment-hint strong { color: #c8c8c8; font-weight: 500; }
-  .comment-actions { display: flex; align-items: center; gap: 1rem; }
-  .comment-actions button {
-    padding: .5rem 1.3rem; background: #2a2a2c; color: #e6e6e6;
+  .comment-open-row { display: flex; align-items: center; gap: .8rem; margin: 1.6rem 0 0; }
+  .comment-open {
+    padding: .55rem 1.4rem; background: #242427; color: #e6e6e6;
     border: 1px solid #3a3a3c; border-radius: 6px; cursor: pointer; font-size: .95em;
   }
-  .comment-actions button:hover:not(:disabled) { background: #343437; }
-  .comment-actions button:disabled { opacity: .6; cursor: default; }
-  .comment-status { font-size: .85em; color: #8a8a8a; }
-  .comment-status.is-error { color: #ff8f8f; }
-  .comment-status.is-ok { color: #7ddc9a; }
-  .comment-status.is-plain { color: #ffffff; }
+  .comment-open:hover { background: #303034; }
+  .comment-open-hint { font-size: .8em; color: #6c6c6c; }
+
+  .comment-draft-tip {
+    display: flex; align-items: center; gap: .8rem; margin: 0 0 1rem;
+    padding: .55rem .85rem; font-size: .82em; color: #9a9a9a;
+    background: #151517; border: 1px solid #262628; border-radius: 6px;
+  }
+  .comment-draft-resume {
+    margin-left: auto; background: none; border: none; padding: 0;
+    color: #7fb0ff; cursor: pointer; font-size: 1em; text-decoration: underline;
+  }
 
   .comment-admin { margin-top: 1.5rem; font-size: .8em; color: #6c6c6c; display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
   .comment-admin > button, #comment-admin-box button {
@@ -99,23 +94,81 @@
   }
   .comment-del:hover { color: #ff8f8f; }
 
-  .comment-quote {
-    padding: .55rem .8rem; margin-bottom: .2rem; border-left: 2px solid #4f8cff;
-    background: #141416; border-radius: 0 4px 4px 0; font-size: .85em; color: #a8a8a8;
-    line-height: 1.75; word-break: break-word;
-  }
-  .comment-quote-text { display: block; white-space: pre-wrap; }
-  .comment-quote-clear {
-    margin-top: .35rem; background: none; border: none; padding: 0;
-    color: #7a7a7a; font-size: .95em; cursor: pointer; text-decoration: underline;
-  }
-  .comment-quote-clear:hover { color: #cfcfcf; }
-
+  /* 选中的「引用」按钮 */
   .quote-pick {
     position: absolute; z-index: 10000; display: none;
-    padding: .22rem .6rem; font-size: .78em; line-height: 1.4;
-    background: #242427; color: #e6e6e6; border: 1px solid #3a3a3c;
-    border-radius: 999px; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,.45);
+    padding: .38rem 1rem; font-size: .92em; line-height: 1.5; letter-spacing: .02em;
+    background: #242427; color: #f0f0f0; border: 1px solid #4a4a4e;
+    border-radius: 999px; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,.55);
   }
-  .quote-pick:hover { background: #303034; }
-</style>
+  .quote-pick:hover { background: #34343a; border-color: #5a5a60; }
+
+  /* 浮动评论框 */
+  .cm-box {
+    display: none; position: fixed; right: 1rem; bottom: 1rem; z-index: 9997;
+    width: min(420px, calc(100vw - 2rem)); max-height: 78vh; overflow: auto;
+    background: #131315; border: 1px solid #2f2f33; border-radius: 10px;
+    box-shadow: 0 18px 48px rgba(0,0,0,.6); padding: .9rem 1rem 1rem;
+  }
+  .cm-head { display: flex; align-items: center; margin-bottom: .7rem; }
+  .cm-title { font-size: .95em; color: #f2f2f2; font-weight: 600; }
+  .cm-close {
+    margin-left: auto; background: none; border: none; color: #8a8a8a;
+    font-size: 1.3em; line-height: 1; cursor: pointer; padding: 0 .2rem;
+  }
+  .cm-close:hover { color: #e6e6e6; }
+  .cm-blocks { display: flex; flex-direction: column; gap: .8rem; }
+  .cm-block {
+    border: 1px solid #262628; border-radius: 8px; padding: .6rem .7rem;
+    background: #121214;
+  }
+  .cm-block-head { display: flex; align-items: center; margin-bottom: .45rem; }
+  .cm-block-no { font-size: .75em; color: #6c6c6c; }
+  .cm-block-del {
+    margin-left: auto; background: none; border: none; color: #6c6c6c;
+    font-size: .78em; cursor: pointer; padding: 0;
+  }
+  .cm-block-del:hover { color: #ff8f8f; }
+  .cm-block-quote {
+    margin: 0 0 .5rem; padding: .4rem .6rem; border-left: 2px solid #3a3a3c;
+    background: #17171a; border-radius: 0 4px 4px 0;
+    color: #9a9a9a; font-size: .82em; line-height: 1.7;
+    white-space: pre-wrap; word-break: break-word; max-height: 7em; overflow: auto;
+  }
+  .cm-block-text {
+    width: 100%; box-sizing: border-box; padding: .5rem .6rem; font-size: .92em;
+    background: #17171a; color: #e6e6e6; border: 1px solid #2a2a2c; border-radius: 6px;
+    font-family: inherit; line-height: 1.7; resize: vertical;
+    min-height: 4.5rem; max-height: 14rem;
+  }
+  .cm-block-text:focus { outline: none; border-color: #4f8cff; }
+  .cm-add-row { margin-top: .7rem; }
+  .cm-add {
+    background: none; border: 1px dashed #333; color: #8a8a8a;
+    border-radius: 6px; padding: .35rem .8rem; font-size: .82em; cursor: pointer;
+    width: 100%;
+  }
+  .cm-add:hover { color: #cfcfcf; border-color: #4a4a4a; }
+  .cm-hint { margin: .8rem 0 0; font-size: .76em; color: #7a7a7a; line-height: 1.6; }
+  .cm-hint strong { color: #c8c8c8; font-weight: 500; }
+  .cm-foot { display: flex; gap: .45rem; margin-top: .7rem; }
+  .cm-name, .cm-answer {
+    flex: 1 1 0; min-width: 0; padding: .45rem .55rem; font-size: .85em;
+    background: #17171a; color: #e6e6e6; border: 1px solid #2a2a2c; border-radius: 6px;
+    font-family: inherit;
+  }
+  .cm-name { flex: 0 0 6.5rem; }
+  .cm-name:focus, .cm-answer:focus { outline: none; border-color: #4f8cff; }
+  .cm-submit {
+    flex: none; padding: .45rem 1rem; font-size: .85em;
+    background: #2a2a2c; color: #e6e6e6; border: 1px solid #3a3a3c;
+    border-radius: 6px; cursor: pointer;
+  }
+  .cm-submit:hover:not(:disabled) { background: #343437; }
+  .cm-submit:disabled { opacity: .6; cursor: default; }
+  .cm-status { display: block; margin-top: .5rem; font-size: .78em; color: #8a8a8a; min-height: 1em; }
+  .cm-status.is-error { color: #ff8f8f; }
+
+  @media (max-width: 560px) {
+    .cm-box { right: .5rem; left: .5rem; bottom: .5rem; width: auto; max-height: 82vh; }
+  }</style>
