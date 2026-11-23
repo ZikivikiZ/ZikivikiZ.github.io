@@ -35,7 +35,16 @@
 		if (!items || !items.length) {
 			var empty = document.createElement('p');
 			empty.className = 'comment-empty';
-			empty.textContent = '还没有评论，来说第一句吧。';
+
+			var strike = document.createElement('span');
+			strike.className = 'comment-strike';
+			strike.textContent = '弹幕善意引导';
+			empty.appendChild(strike);
+
+			empty.appendChild(document.createTextNode('（划掉）'));
+			empty.appendChild(document.createElement('br'));
+			empty.appendChild(document.createTextNode('感谢你的阅读'));
+
 			listEl.appendChild(empty);
 			return;
 		}
